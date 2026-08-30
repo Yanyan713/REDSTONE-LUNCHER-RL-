@@ -1,0 +1,33 @@
+Copyright (c) 2026 yyley2015@hotmail.com
+
+All rights reserved.
+
+Redstone Launcher (RL) is proprietary software owned by yyley2015@hotmail.com.
+
+Redistribution and use in source and binary forms, with or without
+modification, are NOT permitted without prior written authorization
+from the copyright holder.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER "AS IS" AND ANY
+EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+Minecraft is a trademark of Mojang AB / Microsoft Corporation.
+This software is NOT affiliated with, endorsed by, or sponsored by
+Mojang AB or Microsoft Corporation.
+
+Redstone Launcher uses the following third-party components:
+- Minecraft Java Edition assets (c) Mojang AB / Microsoft Corporation
+- Fabric Loader (c) FabricMC
+- Sodium, Sodium Extra, Entity Culling, Iris Shaders (respective authors)
+- BSL Shaders, Complementary Shaders, SEUS (respective authors)
+
+For any questions, contact: yyley2015@hotmail.com
