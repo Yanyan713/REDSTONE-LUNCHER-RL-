@@ -1,0 +1,15 @@
+# Données téléchargées du jeu (volumineux — fournies via l'archive ZIP de release)
+data/
+
+# Sortie de build
+dist/
+build/
+RedstoneLauncher.exe
+
+# Python
+__pycache__/
+*.pyc
+
+# OS
+Thumbs.db
+Desktop.ini

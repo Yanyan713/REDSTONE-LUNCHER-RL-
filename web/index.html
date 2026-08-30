@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Redstone Launcher (RL)</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <svg class="logo" viewBox="0 0 64 64" aria-hidden="true">
+      <rect x="29" y="34" width="6" height="22" fill="#7a6a52"/>
+      <circle cx="32" cy="26" r="10" fill="#e6492d"/>
+      <circle cx="32" cy="26" r="6" fill="#ff7a3c"/>
+      <circle cx="30" cy="24" r="2.4" fill="#ffe9c4" opacity="0.9"/>
+      <circle cx="32" cy="26" r="15" fill="none" stroke="#e6492d" stroke-width="1.5" opacity="0.4"/>
+    </svg>
+    <div>
+      <h1>Redstone <span>Launcher</span></h1>
+      <p class="sub">RL · toutes les versions Minecraft — alpha, bêta, snapshots, releases</p>
+    </div>
+  </div>
+  <div class="header-actions">
+    <button id="btnBedrock" class="btn ghost">Bedrock</button>
+    <button id="btnAccounts" class="btn ghost">Comptes</button>
+    <button id="btnSettings" class="btn ghost">Réglages</button>
+  </div>
+</header>
+
+<main>
+  <aside class="sidebar">
+    <div class="filters">
+      <input id="search" type="text" placeholder="Rechercher une version…" autocomplete="off">
+      <div class="filter-tabs">
+        <button data-filter="all" class="active">Toutes</button>
+        <button data-filter="release">Release</button>
+        <button data-filter="snapshot">Snapshot</button>
+        <button data-filter="old_beta">Bêta</button>
+        <button data-filter="old_alpha">Alpha</button>
+      </div>
+    </div>
+    <ul id="versionList" class="version-list"></ul>
+    <div class="sidebar-foot">
+      <button id="btnRefresh" class="btn tiny">↻ Actualiser la liste</button>
+    </div>
+  </aside>
+
+  <section class="detail">
+    <div id="emptyState" class="empty">
+      <svg class="empty-torch" viewBox="0 0 64 64" width="72" height="72">
+        <rect x="29" y="34" width="6" height="22" fill="#7a6a52"/>
+        <circle cx="32" cy="26" r="10" fill="#e6492d" opacity="0.9"/>
+        <circle cx="32" cy="26" r="6" fill="#ff7a3c"/>
+        <circle cx="30" cy="24" r="2.4" fill="#ffe9c4" opacity="0.9"/>
+      </svg>
+      <p>Sélectionne une version à gauche<br>pour la lancer.</p>
+    </div>
+
+    <div id="detailPane" class="hidden">
+      <div class="detail-head">
+        <h2 id="dVersion"></h2>
+        <span id="dType" class="badge"></span>
+        <span id="dDate" class="muted"></span>
+      </div>
+      <div class="detail-meta">
+        <div class="meta-item"><label>Java requis</label><span id="dJava"></span></div>
+        <div class="meta-item"><label>Client</label><span id="dSizeClient"></span></div>
+        <div class="meta-item"><label>Assets</label><span id="dSizeAssets"></span></div>
+      </div>
+
+      <div class="row account-row">
+        <label for="accountSelect">Compte</label>
+        <select id="accountSelect"></select>
+        <button id="btnNewAccount" class="btn small">+ Nouveau</button>
+      </div>
+
+      <div class="row ram-row">
+        <label for="ramSlider">Mémoire (RAM)</label>
+        <input type="range" id="ramSlider" min="1024" max="8192" step="512">
+        <span id="ramLabel" class="ram-label"></span>
+      </div>
+
+      <div id="javaRow" class="java-hint"></div>
+
+      <div class="row mode-row">
+        <label>Mode de jeu</label>
+        <div class="mode-toggle">
+          <button id="modeVanilla" class="mode-btn active">Vanilla</button>
+          <button id="modeShaders" class="mode-btn">Shaders</button>
+        </div>
+        <span id="modeHint" class="muted mode-hint"></span>
+      </div>
+
+      <div class="detail-actions">
+        <button id="btnPlay" class="btn play">▶&nbsp; JOUER</button>
+        <button id="btnMods" class="btn mods" title="Gérer les mods de cette version">⚙&nbsp; Mods</button>
+      </div>
+
+      <div id="progressArea" class="hidden">
+        <div class="progress-stage">
+          <span id="pStage"></span>
+          <span id="pPercent" class="muted"></span>
+        </div>
+        <div class="progress-track"><div id="pBar" class="progress-bar"></div></div>
+        <div id="pMessage" class="muted"></div>
+        <details id="logBox">
+          <summary>Journal de lancement</summary>
+          <pre id="logText"></pre>
+        </details>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- Comptes -->
+<div id="modalAccounts" class="modal hidden">
+  <div class="modal-card">
+    <div class="modal-head"><h3>Comptes</h3><button class="btn close" data-close>×</button></div>
+    <div class="account-list" id="accountList"></div>
+    <div class="modal-sep">Ajouter un compte</div>
+    <div class="offline-add">
+      <input id="offlineName" type="text" placeholder="Nom du compte local (hors-ligne)">
+      <button id="btnAddOffline" class="btn small">Créer</button>
+    </div>
+    <p class="hint">Le compte <b>local</b> ne nécessite <b>aucune connexion</b> (mode hors-ligne,
+      idéal pour une utilisation éducative / en classe). Tu peux aussi lui <b>ajouter un skin</b>
+      (bouton « Skin » sur le compte, fichier PNG 64×64 ou 128×128).</p>
+    <button id="btnMSLogin" class="btn small red">Se connecter avec un compte Microsoft</button>
+    <p class="hint">Le compte Microsoft permet de jouer en ligne avec un vrai profil Minecraft
+      (et son skin officiel). La connexion se fait <b>sans mot de passe</b> : chaque personne
+      saisit elle-même ses identifiants sur la page Microsoft — le lanceur ne stocke jamais
+      de mot de passe.</p>
+    <div id="msArea" class="hidden">
+      <div class="ms-code-box">
+        <p>Va sur <b id="msUri"></b> et saisis le code :</p>
+        <div id="msCode" class="ms-code"></div>
+      </div>
+    </div>
+    <div id="msMessage" class="muted"></div>
+  </div>
+</div>
+
+<!-- Réglages -->
+<div id="modalSettings" class="modal hidden">
+  <div class="modal-card">
+    <div class="modal-head"><h3>Réglages</h3><button class="btn close" data-close>×</button></div>
+    <div class="set-row">
+      <label>Dossier d'installation du jeu (instances : mondes, mods, config)</label>
+      <div class="path-row">
+        <input id="setInstallDir" type="text" placeholder="vide = dossier par défaut du lanceur">
+        <button id="btnBrowse" class="btn small">Parcourir…</button>
+      </div>
+      <p class="hint">Chaque version installée est un sous-dossier (ex : « 1.20.4 ») contenant
+        ses mondes, ses mods et sa configuration.</p>
+    </div>
+    <div class="set-row">
+      <label>Java (chemin vers java.exe, vide = auto)</label>
+      <input id="setJava" type="text" placeholder="ex: C:\...\bin\java.exe">
+    </div>
+    <div class="set-row">
+      <label>Proxy local (optionnel, ex : http://127.0.0.1:7890)</label>
+      <input id="setProxy" type="text" placeholder="vide = proxy système / aucun">
+      <p class="hint">Utile si tu passes par un proxy pour accéder à Minecraft.</p>
+    </div>
+    <div class="set-row">
+      <label>Source de téléchargement</label>
+      <select id="setMirror">
+        <option value="auto">Auto — officiel, puis miroir BMCLAPI</option>
+        <option value="off">Mojang uniquement</option>
+        <option value="bmclapi">Miroir BMCLAPI en priorité</option>
+      </select>
+    </div>
+    <div class="set-row check">
+      <label for="setAutoJava">Télécharger automatiquement Java si nécessaire</label>
+      <input id="setAutoJava" type="checkbox">
+    </div>
+    <div class="set-row check">
+      <label for="setFullscreen">Lancer le jeu en plein écran</label>
+      <input id="setFullscreen" type="checkbox">
+    </div>
+    <div class="set-row">
+      <label>Résolution de la fenêtre</label>
+      <div class="res-row">
+        <input id="setWidth" type="number" min="320" step="16"> ×
+        <input id="setHeight" type="number" min="240" step="16">
+      </div>
+    </div>
+    <div id="javaStatus" class="java-hint"></div>
+    <button id="btnSaveSettings" class="btn">Enregistrer</button>
+  </div>
+</div>
+
+<!-- Minecraft Bedrock -->
+<div id="modalBedrock" class="modal hidden">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3>Minecraft Bedrock Edition</h3>
+      <button class="btn close" data-close>×</button>
+    </div>
+
+    <div id="bedrockStatus">
+      <div class="bedrock-not-installed hidden">
+        <p>Minecraft Bedrock n'est pas installé sur cet ordinateur.</p>
+        <p class="hint">Bedrock est disponible gratuitement si tu possèdes Minecraft Java
+          (compte Microsoft lié). Sinon, achète-le sur le Microsoft Store.</p>
+        <button id="btnBedrockStore" class="btn">Ouvrir le Microsoft Store</button>
+      </div>
+
+      <div class="bedrock-installed hidden">
+        <div class="bedrock-info">
+          <div class="bedrock-icon">🟩</div>
+          <div>
+            <div class="bedrock-name">Minecraft Bedrock</div>
+            <div class="bedrock-version muted" id="bedrockVersion"></div>
+          </div>
+        </div>
+        <button id="btnBedrockPlay" class="btn play full">▶&nbsp; JOUER À BEDROCK</button>
+        <p class="hint">Bedrock se lance avec ton compte Microsoft connecté au Store.
+          Aucune connexion supplémentaire n'est nécessaire dans le lanceur.</p>
+
+        <div class="modal-sep">Resource packs</div>
+        <div class="bedrock-packs">
+          <div id="dropZoneBedrock" class="drop-zone">
+            <p>Dépose un fichier <b>.mcpack</b> ici<br>ou clique pour choisir</p>
+          </div>
+          <input id="bedrockPackInput" type="file" accept=".mcpack,.zip" class="hidden">
+          <ul id="bedrockPackList" class="mod-list"></ul>
+          <button id="btnBedrockOpenFolder" class="btn small ghost">📂 Ouvrir le dossier des packs</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast hidden"></div>
+
+<!-- Mods -->
+<div id="modalMods" class="modal hidden">
+  <div class="modal-card wide">
+    <div class="modal-head">
+      <h3>Mods — <span id="modsVersion"></span></h3>
+      <button class="btn close" data-close>×</button>
+    </div>
+    <div class="mods-grid">
+      <div class="mods-local">
+        <h4>Mods installés <span class="muted">(dossier « mods » de la version)</span></h4>
+
+        <!-- Installation de Fabric -->
+        <div class="fabric-box">
+          <div class="fabric-head">
+            <span class="fabric-icon">🧵</span>
+            <div>
+              <div class="fabric-title">Fabric (mod loader)</div>
+              <div class="fabric-desc muted" id="fabricStatus">Vérification…</div>
+            </div>
+          </div>
+          <div class="fabric-actions" id="fabricActions">
+            <select id="fabricLoaderSelect" class="small"></select>
+            <button id="btnFabricInstall" class="btn small">Installer Fabric</button>
+          </div>
+        </div>
+
+        <div id="dropZone" class="drop-zone">
+          <p>Dépose tes fichiers <b>.jar</b> ici<br>ou clique pour choisir</p>
+        </div>
+        <input id="modFileInput" type="file" multiple accept=".jar,.zip" class="hidden">
+        <ul id="modList" class="mod-list"></ul>
+        <p class="hint">Un mod <b>désactivé</b> porte l'extension <code>.disabled</code> et n'est
+          pas chargé par le jeu. Pense à installer un loader (Forge / Fabric) pour que les mods fonctionnent.</p>
+      </div>
+      <div class="mods-search">
+        <h4>Pack Shaders (préconfiguré)</h4>
+        <div class="shaders-box">
+          <p class="shaders-desc">Installe en un clic : <b>Sodium</b>, <b>Sodium Extra</b>,
+            <b>Entity Culling</b>, <b>Iris</b> + plusieurs shaders (Complementary, BSL, Vanilla Plus).</p>
+          <div class="shaders-list" id="shadersList"></div>
+          <button id="btnInstallShaders" class="btn small full">⚡ Installer le pack Shaders</button>
+          <p class="hint">Nécessite Fabric (installé automatiquement si absent).</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Explorateur de dossiers -->
+<div id="modalFolder" class="modal hidden">
+  <div class="modal-card">
+    <div class="modal-head"><h3>Choisir un dossier d'installation</h3><button class="btn close" data-close>×</button></div>
+    <div id="folderPath" class="folder-path"></div>
+    <ul id="folderList" class="folder-list"></ul>
+    <div class="folder-actions">
+      <button id="btnFolderUp" class="btn small">↑ Dossier parent</button>
+      <button id="btnFolderChoose" class="btn">Choisir ce dossier</button>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
